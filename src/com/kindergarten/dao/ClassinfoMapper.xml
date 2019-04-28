@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kindergarten.dao.ClassinfoMapper">
+	<!-- 管理员查询所有班级信息 -->
+	<select id="queryAllClassinfo" resultMap="Classinfo_classType" >
+		select
+		c.classId,c.className,ct.classTypeId,ct.classTypeName
+		from classinfo c,classtype ct where c.classTypeId=ct.classTypeId 
+	</select>
+	<resultMap id="Classinfo_classType" type="com.kindergarten.entity.Classinfo">
+		   <id column="classId" property="classId" jdbcType="INTEGER" />
+		    <result column="className" property="className" jdbcType="VARCHAR" />
+		    
+		     <association property="classtype" javaType="com.kindergarten.entity.ClassType">
+			 <id column="classTypeId" property="classTypeId" jdbcType="INTEGER" />
+		    <result column="classTypeName" property="classTypeName" jdbcType="VARCHAR" />
+		    </association>
+	</resultMap>
+	<select id="queryClassinfoByType" resultType="Classinfo" parameterType="int">
+		select
+		c.classId,
+		c.className,
+		ct.classTypeId "classtype.classTypeId",		
+		ct.classTypeName "classtype.classTypeName"
+		from classinfo c,classtype ct where c.classTypeId=ct.classTypeId and c.classTypeId=#{ctyId}
+	</select>
+	
+	<!-- 组合+模糊查询班级信息 -->
+	<select id="queryClassinfoByIf" parameterType="Classinfo" resultMap="Classinfo_classType_If">
+		select c.classId,c.className,ct.classTypeId,ct.classTypeName
+		from classinfo c,classtype ct
+		<where>
+			c.classTypeId=ct.classTypeId
+			<if test="className !=null and className!=''">
+			and className LIKE '%${className}%'
+			</if>
+		</where>
+	</select>
+	<resultMap id="Classinfo_classType_If" type="com.kindergarten.entity.Classinfo" extends="Classinfo_classType">
+		
+	</resultMap>
+
+	<!-- <update id="updateUser" parameterType="com.kindergarten.entity.User"> 
+		update user <set> <if test="userId != null and userId gt 0"> userId = #{userId}, 
+		</if> <if test="userName !=null and userName!=''"> userName=#{userName}, 
+		</if> <if test="realName !=null and realName!=''"> realName=#{realName}, 
+		</if> <if test="userSex !=null and userSex!=''"> userSex=#{userSex}, </if> 
+		<if test="userPhone !=null and userPhone!=''"> userPhone=#{userPhone}, </if> 
+		<if test="userAddress !=null and userAddress!=''"> userAddress=#{userAddress} 
+		</if> </set> where user.userId=#{userId}; </update> -->
+	<!-- 管理员删除班级 -->
+	<delete id="deleteClassinfo" parameterType="int">
+		delete from classinfo where classId=#{classId}
+	</delete>
+	<!-- 查询班级信息 -->
+	<select id="queryClassinfo" resultType="Classinfo">
+	select classId,className from classinfo
+	</select>
+	<!-- 查询班级类别信息（ajax下拉列表用到） -->
+	<select id="queryClassType" resultType="ClassType">
+	 select classTypeId,classTypeName from classtype
+	</select>
+</mapper>

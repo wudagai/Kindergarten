@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kindergarten.dao.ChildrenMapper" >
+     <!--   查询所有幼儿信息 -->
+	<select id="queryAllChildren"  resultMap="children_class">
+	  select 
+		ch.childrenId,ch.childrenName,ch.childrenSex,ch.birthday,ch.enterDate, ch.childrenPhoto,ch.childrenStat,
+		c.classId,c.className,
+		ct.classTypeId,ct.classTypeName,
+		t.teacherId,t.teacherName,t.teacherPhone 
+		from children ch,classinfo c,teacher t,classtype ct
+	    where ch.classId=c.classId and c.classTypeId=ct.classTypeId
+	    and c.teacherId=t.teacherId and  ch.childrenStat=1
+	</select>
+	 <resultMap id="children_class" type="com.kindergarten.entity.Children" >
+		 <id column="childrenId" property="childrenId" jdbcType="INTEGER" />
+	    <result column="childrenName" property="childrenName" jdbcType="VARCHAR" />
+	    <result column="childrenSex" property="childrenSex" jdbcType="CHAR" />
+	    <result column="birthday" property="birthday" jdbcType="DATE" />
+	    <result column="enterDate" property="enterDate" jdbcType="DATE" />
+	    <result column="childrenPhoto" property="childrenPhoto" jdbcType="VARCHAR" />
+	    <result column="childrenStat" property="childrenStat" jdbcType="CHAR" />
+	    
+	      <association property="classinfos" javaType="com.kindergarten.entity.Classinfo">
+			 <id column="classId" property="classId" jdbcType="INTEGER" />
+		    <result column="className" property="className" jdbcType="VARCHAR" />
+		    
+		     <association property="classtype" javaType="com.kindergarten.entity.ClassType">
+			 <id column="classTypeId" property="classTypeId" jdbcType="INTEGER" />
+		    <result column="classTypeName" property="classTypeName" jdbcType="VARCHAR" />
+		    </association>
+		    
+		    <association property="teacher" javaType="com.kindergarten.entity.Teacher">
+			  <id column="teacherId" property="teacherId" jdbcType="INTEGER" />
+		    <result column="teacherName" property="teacherName" jdbcType="VARCHAR" />
+		    <result column="teacherPhone" property="teacherPhone" jdbcType="VARCHAR" />
+		</association>	 
+		    </association>
+	    
+	</resultMap>
+	<!-- 组合+模糊查询幼儿信息 -->
+	<select id="queryChildrenByIf" parameterType="Children" resultMap="children_class_if">
+		 select 
+		ch.childrenId,ch.childrenName,ch.childrenSex,ch.birthday,ch.enterDate, ch.childrenPhoto,ch.childrenStat,
+		c.classId,c.className,
+		ct.classTypeId,ct.classTypeName,
+		t.teacherId,t.teacherName,t.teacherPhone 
+		from children ch,classinfo c,teacher t,classtype ct
+		<where>
+	     ch.classId=c.classId and c.classTypeId=ct.classTypeId
+	    and c.teacherId=t.teacherId and ch.childrenStat=1
+		<if test="classinfos.className !=null and classinfos.className!=''">  
+		 and className LIKE '%${classinfos.className}%'
+		</if>
+		<if test="childrenName !=null and childrenName!=''">  
+		  and childrenName LIKE '%${childrenName}%'
+		</if>
+		</where>
+	</select>
+	<resultMap id="children_class_if" type="com.kindergarten.entity.Children" extends="children_class">
+	
+	</resultMap>
+	<!-- 查询某个幼儿详细的信息 -->
+	<select id="queryChildrenById" resultMap="user_children_class_teacher">
+	    select 
+		ch.childrenId,ch.childrenName,ch.childrenSex,ch.birthday,ch.enterDate, ch.childrenPhoto,ch.childrenStat,
+		c.classId,c.className,
+		ct.classTypeId,ct.classTypeName,
+		t.teacherId,t.teacherName,t.teacherPhone 
+		from children ch,classinfo c,teacher t,classtype ct
+	    where ch.classId=c.classId and c.classTypeId=ct.classTypeId
+	    and c.teacherId=t.teacherId and  ch.childrenId=#{childrenId} and ch.childrenStat=1
+	</select>
+	<resultMap id="user_children_class_teacher" type="com.kindergarten.entity.Children" extends="children_class">
+
+	</resultMap>
+<!-- 	查询某个幼儿的所有体检信息 -->
+	<select id="queryExaminationById" parameterType="int" resultMap="children_examination" >
+	select ch.childrenId,ch.childrenName,ch.childrenStat,
+	ex.examinationId,ex.examinationDate,ex.weight,
+     ex.hight,ex.hearing,ex.vision,ex.teethNumber,
+     ex.infectiousDisease,ex.remarks 
+     from Examination ex,Children ch 
+     where ch.childrenId=ex.childrenId and ch.childrenId=#{childrenId} and ch.childrenStat=1
+	</select>
+	<resultMap id="children_examination" type="com.kindergarten.entity.Children" >
+	    <id column="childrenId" property="childrenId" jdbcType="INTEGER" />
+	    <result column="childrenName" property="childrenName" jdbcType="VARCHAR" />
+	     <result column="childrenStat" property="childrenStat" jdbcType="CHAR" />
+	     
+	     <collection property="examinations" ofType="com.kindergarten.entity.Examination">
+	        <id column="examinationId" property="examinationId" jdbcType="INTEGER" />
+		    <result column="examinationDate" property="examinationDate" jdbcType="DATE" />
+		    <result column="weight" property="weight" jdbcType="VARCHAR" />
+		    <result column="hight" property="hight" jdbcType="VARCHAR" />
+		    <result column="hearing" property="hearing" jdbcType="VARCHAR" />
+		    <result column="vision" property="vision" jdbcType="VARCHAR" />
+		    <result column="teethNumber" property="teethNumber" jdbcType="INTEGER" />
+		    <result column="infectiousDisease" property="infectiousDisease" jdbcType="VARCHAR" />
+		    <result column="remarks" property="remarks" jdbcType="VARCHAR" />	    
+	   </collection>	   
+	</resultMap>
+	<!-- 查询某个幼儿的所有用药信息 -->
+	<select id="queryMedicationById" parameterType="int" resultMap="children_medication">
+	select ch.childrenId,ch.childrenName,ch.childrenStat,
+	me.medicationId,me.symptoms,me.sickTime,me.medicine,me.takeMedicineTime,
+	me.frequency,me.means,me.takeMedicineDay,me.untowardEffect,me.remarks 
+	from children ch,medication me 
+	where ch.childrenId=me.childrenId and ch.childrenId=#{childrenId} and ch.childrenStat=1
+	</select>
+  <resultMap id="children_medication" type="com.kindergarten.entity.Children">
+        <id column="childrenId" property="childrenId" jdbcType="INTEGER" />
+	   <result column="childrenName" property="childrenName" jdbcType="VARCHAR" />
+	     <result column="childrenStat" property="childrenStat" jdbcType="CHAR" />
+	   
+	   <collection property="medications" ofType="com.kindergarten.entity.Medication">
+			<id column="medicationId" property="medicationId" jdbcType="INTEGER" />
+		    <result column="symptoms" property="symptoms" jdbcType="VARCHAR" />
+		    <result column="sickTime" property="sickTime" jdbcType="TIMESTAMP" />
+		    <result column="medicine" property="medicine" jdbcType="VARCHAR" />
+		    <result column="takeMedicineTime" property="takeMedicineTime" jdbcType="TIMESTAMP" />
+		    <result column="frequency" property="frequency" jdbcType="VARCHAR" />
+		    <result column="means" property="means" jdbcType="VARCHAR" />
+		    <result column="takeMedicineDay" property="takeMedicineDay" jdbcType="VARCHAR" />
+		    <result column="untowardEffect" property="untowardEffect" jdbcType="VARCHAR" />
+		    <result column="remarks" property="remarks" jdbcType="VARCHAR" />
+		</collection>
+  </resultMap>
+  <!-- 查询某个幼儿的某条用药信息 -->
+  <select id="queryMedication" parameterType="int" resultMap="medication_children">
+	select ch.childrenId,ch.childrenName,ch.childrenStat,
+	me.medicationId,me.symptoms,me.sickTime,me.medicine,me.takeMedicineTime,
+	me.frequency,me.means,me.takeMedicineDay,me.untowardEffect,me.remarks 
+	from children ch,medication me 
+	where ch.childrenId=me.childrenId and me.medicationId=#{medicationId} and ch.childrenStat=1
+	</select>
+  <resultMap id="medication_children" type="com.kindergarten.entity.Medication">
+       <id column="medicationId" property="medicationId" jdbcType="INTEGER" />
+		    <result column="symptoms" property="symptoms" jdbcType="VARCHAR" />
+		    <result column="sickTime" property="sickTime" jdbcType="TIMESTAMP" />
+		    <result column="medicine" property="medicine" jdbcType="VARCHAR" />
+		    <result column="takeMedicineTime" property="takeMedicineTime" jdbcType="TIMESTAMP" />
+		    <result column="frequency" property="frequency" jdbcType="VARCHAR" />
+		    <result column="means" property="means" jdbcType="VARCHAR" />
+		    <result column="takeMedicineDay" property="takeMedicineDay" jdbcType="VARCHAR" />
+		    <result column="untowardEffect" property="untowardEffect" jdbcType="VARCHAR" />
+		    <result column="remarks" property="remarks" jdbcType="VARCHAR" />
+
+	   <association property="children" javaType="com.kindergarten.entity.Children">
+	    <id column="childrenId" property="childrenId" jdbcType="INTEGER" />
+	     <result column="childrenName" property="childrenName" jdbcType="VARCHAR" />
+	     <result column="childrenStat" property="childrenStat" jdbcType="CHAR" />
+			
+		</association>
+  </resultMap>
+  
+  <!--  查询某个幼儿的某个体检信息-->
+  <select id="queryExamination" resultMap="examination_children" parameterType="int">
+  	select ch.childrenId,ch.childrenName,ch.childrenStat,
+	ex.examinationId,ex.examinationDate,ex.weight,
+     ex.hight,ex.hearing,ex.vision,ex.teethNumber,
+     ex.infectiousDisease,ex.remarks 
+     from Examination ex,Children ch 
+     where ch.childrenId=ex.childrenId and ex.examinationId=#{examinationId} and ch.childrenStat=1
+  </select>
+   <resultMap id="examination_children" type="com.kindergarten.entity.Examination" >
+           <id column="examinationId" property="examinationId" jdbcType="INTEGER" />
+		    <result column="examinationDate" property="examinationDate" jdbcType="DATE" />
+		    <result column="weight" property="weight" jdbcType="VARCHAR" />
+		    <result column="hight" property="hight" jdbcType="VARCHAR" />
+		    <result column="hearing" property="hearing" jdbcType="VARCHAR" />
+		    <result column="vision" property="vision" jdbcType="VARCHAR" />
+		    <result column="teethNumber" property="teethNumber" jdbcType="INTEGER" />
+		    <result column="infectiousDisease" property="infectiousDisease" jdbcType="VARCHAR" />
+		    <result column="remarks" property="remarks" jdbcType="VARCHAR" />	    
+    
+	     <association property="children" javaType="com.kindergarten.entity.Children">
+	     <id column="childrenId" property="childrenId" jdbcType="INTEGER" />
+	    <result column="childrenName" property="childrenName" jdbcType="VARCHAR" />
+	     <result column="childrenStat" property="childrenStat" jdbcType="CHAR" />
+	       
+	  </association>	   
+	</resultMap>
+  <!-- 管理员删除幼儿（删除报名信息） -->
+  <delete id="deleteChildren" parameterType="int">
+			delete from children where childrenId=#{childrenId}
+	</delete>
+	
+	<!-- 幼儿报名 -->
+	<insert id="appleChildren" useGeneratedKeys="true" 
+	keyColumn="childrenId" keyProperty="childrenId"
+	parameterType="Children">
+		insert into children(childrenName,childrenSex,birthday,childrenPhoto,childrenAddress,classId,userId) 
+		values(#{childrenName},#{childrenSex},#{birthday},#{childrenPhoto},#{childrenAddress},#{classinfos.classId},#{user.userId})
+	</insert>
+	<!-- 幼儿请假 -->
+	<insert id="leaveChildren" useGeneratedKeys="true" 
+	keyColumn="leaveId" keyProperty="leaveId"
+	parameterType="ChildrenLeave">
+		insert into childrenleave(leaveType,leaveStart,leaveEnd,leaveReason,childrenId) 
+		values(#{leaveType},#{leaveStart},#{leaveEnd},#{leaveReason},#{children.childrenId})
+	</insert>
+
+</mapper>

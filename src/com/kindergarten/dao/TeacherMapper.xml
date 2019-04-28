@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kindergarten.dao.TeacherMapper" >
+
+  <!-- 老师登陆 -->
+	<select id="findTeacherByNameAndPwd" parameterType="Teacher" resultType="Teacher">
+		select teacherId,loginName,password from teacher where teacher.loginName=#{loginName} and teacher.password=#{password}
+	</select>
+	<select id="queryTeacherById" parameterType="int" resultType="Teacher">
+		select teacherId,loginName,teacherName,teacherSex,hight,teacherPhone ,teacherPhoto,colleges from teacher
+		where teacher.teacherId=#{teacherId}
+	</select>
+	<!-- 查询所有老师信息 -->
+	<select id="queryAllTeacher"  resultType="Teacher">
+		select teacherId,loginName,teacherName,teacherSex,hight,teacherPhone ,teacherPhoto,colleges from teacher
+	</select>
+   <!-- 	模糊+组合查询所有老师信息 -->
+    <select id="queryTeacherByIf" parameterType="Teacher" resultType="Teacher">
+		select teacherId,loginName,teacherName,teacherSex,hight,teacherPhone ,teacherPhoto,colleges from teacher
+	
+	 <where>
+		<if test="loginName !=null and loginName!=''">  
+		  and loginName LIKE '%${loginName}%'
+		</if>
+	    <if test="teacherName !=null and teacherName!=''"> 
+		 and teacherName LIKE '%${teacherName}%'
+		</if>
+		</where>
+	</select>
+	<!-- 我管理的班级 -->
+	<select id="queryTeaherClass" resultMap="teacher_class" parameterType="int">
+	select th.teacherId,th.teacherName,th.loginName,c.classId,c.className from teacher th,
+     classinfo c where th.teacherId=c.teacherId and th.teacherId=#{teacherId}
+    </select>   
+      <resultMap id="teacher_class" type="com.kindergarten.entity.Teacher" >
+		 <id column="teacherId" property="teacherId" jdbcType="INTEGER" />
+		 <result column="teacherName" property="teacherName" jdbcType="VARCHAR" />
+		 <result column="loginName" property="loginName" jdbcType="VARCHAR" />
+	    
+	       <collection property="classinfos" ofType="com.kindergarten.entity.Classinfo">
+			 <id column="classId" property="classId" jdbcType="INTEGER" />
+		    <result column="className" property="className" jdbcType="VARCHAR" />
+		 </collection>
+	    
+	</resultMap>
+	<select id="queryClassChildren" resultMap="children_class" parameterType="int">
+      select c.classId,c.className,ch.childrenId,ch.childrenName,ch.childrenSex,ch.birthday,ch.enterDate, ch.childrenPhoto,ch.childrenStat from classinfo c,children ch
+		where ch.classId=c.classId and c.classId=#{classId} and ch.childrenStat=1
+		
+		</select>
+		<resultMap id="children_class" type="com.kindergarten.entity.Classinfo" >
+		 <id column="classId" property="classId" jdbcType="INTEGER" />
+		    <result column="className" property="className" jdbcType="VARCHAR" />
+	    
+	       <collection property="childrens" ofType="com.kindergarten.entity.Children">
+	       <id column="childrenId" property="childrenId" jdbcType="INTEGER" />
+			<result column="childrenName" property="childrenName" jdbcType="VARCHAR" />
+	    <result column="childrenSex" property="childrenSex" jdbcType="CHAR" />
+	    <result column="birthday" property="birthday" jdbcType="DATE" />
+	    <result column="enterDate" property="enterDate" jdbcType="DATE" />
+	    <result column="childrenPhoto" property="childrenPhoto" jdbcType="VARCHAR" />
+	    <result column="childrenStat" property="childrenStat" jdbcType="CHAR" />
+		 </collection>
+		 </resultMap>
+	<delete id="deleteTeacher" parameterType="int">
+			delete from teacher where teacherId=#{teacherId}
+	</delete>
+	<!-- 管理员修改班主任信息 -->
+	<update id="updateTeacherById" parameterType="com.kindergarten.entity.Teacher">
+		update teacher
+		<set>
+		<if test="teacherName !=null and teacherName!=''">  
+		teacherName=#{teacherName},
+		</if>
+	    <if test="loginName !=null and loginName!=''"> 
+		loginName=#{loginName},
+		</if>
+		<if test="teacherSex !=null and teacherSex!=''">  
+		teacherSex=#{teacherSex},
+		</if>
+		<if test="teacherPhone !=null and teacherPhone!=''">  
+		teacherPhone=#{teacherPhone},
+		</if>
+		<if test="hight !=null and hight!=''">  
+		hight=#{hight},
+		</if>
+		<if test="colleges !=null and colleges!=''">  
+		 colleges=#{colleges}
+		</if>
+	</set>
+		where teacher.teacherId=#{teacherId};
+	</update>
+  <!-- 班主任修改用药信息 -->
+	<update id="updateMedication" parameterType="com.kindergarten.entity.Medication">
+		update Medication
+		<set>
+		<if test="medicationId !=null and medicationId!=''">  
+		medicationId=#{medicationId}, 
+		</if>
+	    <if test="symptoms !=null and symptoms!=''"> 
+		symptoms=#{symptoms}, 
+		</if>
+		<if test="sickTime !=null and sickTime!=''">  
+		sickTime=#{sickTime}, 
+		</if>
+		<if test="medicine !=null and medicine!=''">  
+		medicine=#{medicine},
+		</if>
+		<if test="takeMedicineTime !=null and takeMedicineTime!=''">  
+		takeMedicineTime=#{takeMedicineTime},
+		</if>
+		<if test="frequency !=null and frequency!=''">  
+		 frequency=#{frequency},
+		</if>
+		<if test="means !=null and means!=''">  
+		 means=#{means},
+		</if>
+		<if test="takeMedicineDay !=null and takeMedicineDay!=''">  
+		 takeMedicineDay=#{takeMedicineDay},
+		</if>
+		<if test="untowardEffect !=null and untowardEffect!=''">  
+		 untowardEffect=#{untowardEffect},
+		</if>
+		<if test="remarks !=null and remarks!=''">  
+		 remarks=#{remarks},
+		</if>
+	    <if test="children!=null">
+		<if test="children.childrenId !=null and children.childrenId!=''">  
+		 childrenId=#{children.childrenId}
+		</if>
+		</if>
+		
+	</set>
+		where medicationId=#{medicationId};
+	</update>
+	
+	<!-- 班主任修改某个孩子的某条体检信息 -->
+	<update id="updateExamination" parameterType="com.kindergarten.entity.Examination">
+		update examination
+		<set>
+		<if test="examinationId !=null and examinationId!=''">  
+		examinationId=#{examinationId}, 
+		</if>
+	    <if test="examinationDate !=null and examinationDate!=''"> 
+		examinationDate=#{examinationDate}, 
+		</if>
+		<if test="weight !=null and weight!=''">  
+		weight=#{weight}, 
+		</if>
+		<if test="hight !=null and hight!=''">  
+		hight=#{hight},
+		</if>
+		<if test="hearing !=null and hearing!=''">  
+		hearing=#{hearing},
+		</if>
+		<if test="vision !=null and vision!=''">  
+		 vision=#{vision},
+		</if>
+		<if test="teethNumber !=null and teethNumber!=''">  
+		 teethNumber=#{teethNumber},
+		</if>
+		<if test="infectiousDisease !=null and infectiousDisease!=''">  
+		 infectiousDisease=#{infectiousDisease},
+		</if>
+		<if test="remarks !=null and remarks!=''">  
+		 remarks=#{remarks},
+		</if>
+	    <if test="children!=null">
+		<if test="children.childrenId !=null and children.childrenId!=''">  
+		 childrenId=#{children.childrenId}
+		</if>
+		</if>
+		
+	</set>
+		where examinationId=#{examinationId};
+	</update>
+	<!-- 为指定幼儿增加体检信息 -->
+	<insert id="addExamination" useGeneratedKeys="true" 
+	keyColumn="examinationId" keyProperty="examinationId"
+	parameterType="Examination">
+		insert into examination(examinationDate,weight,hight,hearing,vision,teethNumber,infectiousDisease,remarks,childrenId) 
+		values(#{examinationDate},#{weight},#{hight},#{hearing},#{vision},#{teethNumber},#{infectiousDisease},#{remarks},#{children.childrenId})
+	</insert>
+	<!-- 为指定幼儿增加用药信息 -->
+	<insert id="addMedication" useGeneratedKeys="true" 
+	keyColumn="medicationId" keyProperty="medicationId"
+	parameterType="Medication">
+		insert into medication(symptoms,sickTime,medicine,takeMedicineTime,frequency,means,takeMedicineDay,untowardEffect,remarks,childrenId) 
+		values(#{symptoms},#{sickTime},#{medicine},#{takeMedicineTime},#{frequency},#{means},#{takeMedicineDay},#{untowardEffect},#{remarks},#{children.childrenId})
+	</insert>
+	
+	<delete id="deleteExamination" parameterType="int">
+			delete from examination where examinationId=#{examinationId}
+	</delete>
+	<delete id="deleteMedication" parameterType="int">
+			delete from medication where medicationId=#{medicationId}
+	</delete>
+	
+	<delete id="deleteleave" parameterType="int">
+			delete from childrenleave where leaveId=#{leaveId}
+	</delete>
+	
+	  <select id="queryLeave" parameterType="int" resultMap="children_childrenleave">
+   select ch.childrenId,ch.childrenName,
+   cl.childrenId,cl.leaveId,cl.leaveType,cl.leaveStart,cl.leaveEnd,cl.leaveReason,cl.leaveState
+    from childrenleave cl,children ch where  ch.childrenId=cl.childrenId and ch.childrenId=#{childrenId}   
+  </select>
+  <resultMap id="children_childrenleave" type="com.kindergarten.entity.Children" >
+  <id column="childrenId" property="childrenId" jdbcType="INTEGER" />
+  <result column="childrenName" property="childrenName" jdbcType="VARCHAR" />
+   
+   <collection property="childrenleaves" ofType="com.kindergarten.entity.ChildrenLeave">
+	      <id column="leaveId" property="leaveId" jdbcType="INTEGER" />
+	    <result column="leaveType" property="leaveType" jdbcType="VARCHAR" />
+	    <result column="leaveStart" property="leaveStart" jdbcType="DATE" />
+	    <result column="leaveEnd" property="leaveEnd" jdbcType="DATE" />
+	    <result column="leaveReason" property="leaveReason" jdbcType="VARCHAR" /> 
+	     <result column="leaveState" property="leaveState" jdbcType="CHAR" /> 
+	      
+			</collection> 
+  </resultMap>
+  
+  <!-- 班主任更改请假状态0——1 -->
+	<update id="updateLeaveOne" parameterType="int">
+		update childrenleave set leaveState=1 where leaveId=#{leaveId};
+	</update>
+	<!-- 班主任更改请假状态1——3 -->
+	<update id="updateLeaveTwo" parameterType="int">
+		update childrenleave set leaveState=3 where leaveId=#{leaveId};
+	</update>
+  
+<!--  
+  <select id="queryLeave" parameterType="int" resultMap="teacher_class_children_childrenleave">
+   select th.teacherId,th.teacherName,
+c.classId,c.className,
+ch.childrenId,ch.childrenName,
+cl.childrenId,cl.leaveId,cl.leaveType,cl.leaveStart,cl.leaveEnd,cl.leaveReason,cl.leaveState
+ from childrenleave cl,classinfo c,teacher th,children ch where th.teacherId=c.teacherId and ch.classId=c.classId and ch.childrenId=cl.childrenId and
+ th.teacherId=#{teacherId}   
+  </select>
+    <resultMap id="teacher_class_children_childrenleave" type="com.kindergarten.entity.Teacher" >
+		 <id column="teacherId" property="teacherId" jdbcType="INTEGER" />
+		 <result column="teacherName" property="teacherName" jdbcType="VARCHAR" />
+		 
+     <collection property="classinfos" ofType="com.kindergarten.entity.Classinfo">
+		 <id column="classId" property="classId" jdbcType="INTEGER" />
+		    <result column="className" property="className" jdbcType="VARCHAR" />
+	    
+	       <collection property="childrens" ofType="com.kindergarten.entity.Children">
+	       <id column="childrenId" property="childrenId" jdbcType="INTEGER" />
+			<result column="childrenName" property="childrenName" jdbcType="VARCHAR" />
+	    <result column="childrenSex" property="childrenSex" jdbcType="CHAR" />
+	    <result column="birthday" property="birthday" jdbcType="DATE" />
+	    <result column="enterDate" property="enterDate" jdbcType="DATE" />
+	    <result column="childrenPhoto" property="childrenPhoto" jdbcType="VARCHAR" />
+	    <result column="childrenStat" property="childrenStat" jdbcType="CHAR" />
+	    
+	     <collection property="childrenleaves" ofType="com.kindergarten.entity.ChildrenLeave">
+	      <id column="leaveId" property="leaveId" jdbcType="INTEGER" />
+	    <result column="leaveType" property="leaveType" jdbcType="VARCHAR" />
+	    <result column="leaveStart" property="leaveStart" jdbcType="DATE" />
+	    <result column="leaveEnd" property="leaveEnd" jdbcType="DATE" />
+	    <result column="leaveReason" property="leaveReason" jdbcType="VARCHAR" /> 
+	     <result column="leaveState" property="leaveState" jdbcType="CHAR" /> 
+	      
+			</collection> 
+		 </collection>
+	 </collection>
+ </resultMap>-->
+</mapper>

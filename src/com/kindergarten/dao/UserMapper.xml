@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kindergarten.dao.UserMapper">
+  	<!-- 用户登录 -->
+	<select id="findUserByNameAndPwd" parameterType="User" resultType="User">
+		select userId,userName,realName,password ,userSex,userPhone, userAddress,mooto ,userStat from user where user.userName=#{userName} and user.password=#{password} 
+		
+		<!-- select userId,userName,userName,password,userSex,userPhone,userAddress,from 
+			user -->
+	</select>
+	<!-- 根据id查询单个用户信息 -->
+	<select id="queryUserById" parameterType="int" resultType="User">
+	select userId, userName, realName, password, userSex,userPhone, userAddress,mooto ,userStat from user where user.userId=#{userId}
+	</select>
+	<!-- 查询用户信息 -->
+	<!-- <select id="queryAllUser"  resultType="User">
+	select userId, userName, realName, password, userSex, userAddress from user
+	</select> -->
+<!--   根据用户id查询他孩子基本信息 -->
+ <select id="queryChildrenByUser" parameterType="int" resultMap="user_children" >
+	select u.userId,u.userName,realName,
+    ch.childrenId,ch.childrenName,ch.childrenSex,ch.birthday,ch.enterDate,ch.childrenStat,ch.childrenPhoto,ch.childrenAddress
+    from user u,children ch where u.userId=ch.userId and u.userId=#{userId} and ch.childrenStat=1
+
+  </select>
+  <resultMap id="user_children" type="com.kindergarten.entity.User">
+  <id column="userId" property="userId" jdbcType="INTEGER" />
+       <result column="userName" property="userName" jdbcType="VARCHAR" />
+       <result column="realName" property="realName" jdbcType="VARCHAR" />
+            
+      <collection property="childrens" ofType="com.kindergarten.entity.Children">
+		 <id column="childrenId" property="childrenId" jdbcType="INTEGER" />
+	    <result column="childrenName" property="childrenName" jdbcType="VARCHAR" />
+	    <result column="childrenSex" property="childrenSex" jdbcType="CHAR" />
+	    <result column="birthday" property="birthday" jdbcType="DATE" />
+	    <result column="enterDate" property="enterDate" jdbcType="DATE" /> 
+	    <result column="childrenStat" property="childrenStat" jdbcType="CHAR" />
+	     <result column="childrenPhoto" property="childrenPhoto" jdbcType="VARCHAR" />
+	      <result column="childrenAddress" property="childrenAddress" jdbcType="VARCHAR" />
+		</collection>
+  </resultMap>
+ <!--  某个用户所有的报名信息 -->
+  <select id="queryApple" parameterType="int" resultMap="user_children_classinfo_classtype" >
+	select u.userId,u.userName,realName,
+    ch.childrenId,ch.childrenName,ch.childrenSex,ch.birthday,ch.enterDate,ch.childrenStat,ch.childrenPhoto,ch.childrenAddress,
+		ct.classTypeId,ct.classTypeName,
+		c.classId,c.className
+        from user u,children ch,classtype ct,classinfo c where u.userId=ch.userId and ct.classTypeId=c.classTypeId and
+		ch.classId=c.classId and u.userId=#{userId}
+  </select>
+  
+  <resultMap id="user_children_classinfo_classtype" type="com.kindergarten.entity.User">
+  <id column="userId" property="userId" jdbcType="INTEGER" />
+       <result column="userName" property="userName" jdbcType="VARCHAR" />
+       <result column="realName" property="realName" jdbcType="VARCHAR" />
+            
+      <collection property="childrens" ofType="com.kindergarten.entity.Children">
+		 <id column="childrenId" property="childrenId" jdbcType="INTEGER" />
+	    <result column="childrenName" property="childrenName" jdbcType="VARCHAR" />
+	    <result column="childrenSex" property="childrenSex" jdbcType="CHAR" />
+	    <result column="birthday" property="birthday" jdbcType="DATE" />
+	    <result column="enterDate" property="enterDate" jdbcType="DATE" /> 
+	    <result column="childrenStat" property="childrenStat" jdbcType="CHAR" />
+	     <result column="childrenPhoto" property="childrenPhoto" jdbcType="VARCHAR" />
+	      <result column="childrenAddress" property="childrenAddress" jdbcType="VARCHAR" />
+	      
+	       <association property="classinfos" javaType="com.kindergarten.entity.Classinfo">
+			 <id column="classId" property="classId" jdbcType="INTEGER" />
+		    <result column="className" property="className" jdbcType="VARCHAR" />
+		    
+		     <association property="classtype" javaType="com.kindergarten.entity.ClassType">
+			 <id column="classTypeId" property="classTypeId" jdbcType="INTEGER" />
+		    <result column="classTypeName" property="classTypeName" jdbcType="VARCHAR" />
+		    </association> 
+		    </association>  
+		</collection>
+  </resultMap>
+  <!-- 某个幼儿的报名信息 -->
+    <select id="queryAppleById" parameterType="int" resultMap="children_classinfo_classtype" >
+	select 
+    ch.childrenId,ch.childrenName,ch.childrenSex,ch.birthday,ch.enterDate,ch.childrenStat,ch.childrenPhoto,ch.childrenAddress,
+		ct.classTypeId,ct.classTypeName,
+		c.classId,c.className
+        from children ch,classtype ct,classinfo c where  ct.classTypeId=c.classTypeId and
+		ch.classId=c.classId and ch.childrenId=#{childrenId}
+  </select>
+  <resultMap id="children_classinfo_classtype" type="com.kindergarten.entity.Children">
+		 <id column="childrenId" property="childrenId" jdbcType="INTEGER" />
+	    <result column="childrenName" property="childrenName" jdbcType="VARCHAR" />
+	    <result column="childrenSex" property="childrenSex" jdbcType="CHAR" />
+	    <result column="birthday" property="birthday" jdbcType="DATE" />
+	    <result column="enterDate" property="enterDate" jdbcType="DATE" /> 
+	    <result column="childrenStat" property="childrenStat" jdbcType="CHAR" />
+	     <result column="childrenPhoto" property="childrenPhoto" jdbcType="VARCHAR" />
+	      <result column="childrenAddress" property="childrenAddress" jdbcType="VARCHAR" />
+	      
+	       <association property="classinfos" javaType="com.kindergarten.entity.Classinfo">
+			 <id column="classId" property="classId" jdbcType="INTEGER" />
+		    <result column="className" property="className" jdbcType="VARCHAR" />
+		    
+		     <association property="classtype" javaType="com.kindergarten.entity.ClassType">
+			 <id column="classTypeId" property="classTypeId" jdbcType="INTEGER" />
+		    <result column="classTypeName" property="classTypeName" jdbcType="VARCHAR" />
+		    </association> 
+		    </association>  
+  </resultMap>
+  <!-- 管理员查询所有报名信息 -->
+ <select id="queryAllApple" parameterType="Children" resultMap="allapple_children" >
+	select 
+    ch.childrenId,ch.childrenName,ch.childrenSex,ch.birthday,ch.enterDate,ch.childrenStat,ch.childrenPhoto,ch.childrenAddress,
+		ct.classTypeId,ct.classTypeName,
+		c.classId,c.className
+        from children ch,classtype ct,classinfo c  where
+	    ct.classTypeId=c.classTypeId and
+		ch.classId=c.classId 
+  </select>
+  <resultMap id="allapple_children" type="com.kindergarten.entity.Children" extends="children_classinfo_classtype">
+	
+	</resultMap>
+	 <!-- 某用户查询所有请假信息-->
+ <select id="queryAllLeave" parameterType="int" resultMap="leave_children" >
+	select u.userId,u.userName,ch.childrenId,ch.childrenName,cl.leaveId,cl.leaveType,cl.leaveStart,cl.leaveEnd,cl.leaveReason,cl.leaveState
+from user u,children ch,childrenleave cl  where u.userId=ch.userId and ch.childrenId=cl.childrenId and u.userId=#{userId}
+  </select> 
+  <resultMap id="leave_children" type="com.kindergarten.entity.User">
+      <id column="userId" property="userId" jdbcType="INTEGER" />
+       <result column="userName" property="userName" jdbcType="VARCHAR" />
+            
+     <collection property="childrens" ofType="com.kindergarten.entity.Children">
+		 <id column="childrenId" property="childrenId" jdbcType="INTEGER" />
+	    <result column="childrenName" property="childrenName" jdbcType="VARCHAR" />
+	      
+	   <collection property="childrenleaves" ofType="com.kindergarten.entity.ChildrenLeave">
+	      <id column="leaveId" property="leaveId" jdbcType="INTEGER" />
+	    <result column="leaveType" property="leaveType" jdbcType="VARCHAR" />
+	    <result column="leaveStart" property="leaveStart" jdbcType="DATE" />
+	    <result column="leaveEnd" property="leaveEnd" jdbcType="DATE" />
+	    <result column="leaveReason" property="leaveReason" jdbcType="VARCHAR" /> 
+	     <result column="leaveState" property="leaveState" jdbcType="CHAR" /> 
+	      
+			</collection>
+	</collection>
+  </resultMap> 
+
+	<!-- 修改用户信息 -->
+	<update id="updateUserById" parameterType="com.kindergarten.entity.User">
+		update user
+		<set>
+		<!-- <if test="userId != null and userId gt 0">
+		userId = #{userId},
+		</if> -->
+		<if test="userName !=null and userName!=''">  
+		userName=#{userName},
+		</if>
+	    <if test="realName !=null and realName!=''"> 
+		realName=#{realName},
+		</if>
+		<if test="userSex !=null and userSex!=''">  
+		userSex=#{userSex},
+		</if>
+		<if test="userPhone !=null and userPhone!=''">  
+		userPhone=#{userPhone},
+		</if>
+		<if test="userAddress !=null and userAddress!=''">  
+		userAddress=#{userAddress},
+		</if>
+		<if test="userStat !=null and userStat!=''">  
+		 userStat=#{userStat}
+		</if>
+	</set>
+		where user.userId=#{userId};
+	</update>
+	<!-- 用户修改报名信息 -->
+	<update id="updateApple" parameterType="com.kindergarten.entity.Children">
+		update Children
+		<set>
+		<if test="childrenName !=null and childrenName!=''">  
+		childrenName=#{childrenName},
+		</if>
+	    <if test="childrenSex !=null and childrenSex!=''"> 
+		childrenSex=#{childrenSex},
+		</if>
+		<if test="birthday !=null and birthday!=''">  
+		birthday=#{birthday},
+		</if>
+		<if test="childrenPhoto !=null and childrenPhoto!=''">  
+		childrenPhoto=#{childrenPhoto},
+		</if>
+		<if test="childrenAddress !=null and childrenAddress!=''">  
+		childrenAddress=#{childrenAddress},
+		</if>
+		<if test="enterDate !=null and enterDate!=''">  
+		enterDate=#{enterDate},
+		</if>
+		<if test="childrenStat !=null and childrenStat!=''">  
+		childrenStat=#{childrenStat},
+		</if>
+		<if test="classinfos.classId !=null and classinfos.classId!=''">  
+		 classId=#{classinfos.classId}
+		</if>
+	</set>
+		where children.childrenId=#{childrenId};
+	</update>
+	<!--用户注册 -->
+		<insert id="addUser" useGeneratedKeys="true" 
+	keyColumn="userId" keyProperty="userId"
+	parameterType="User">
+		insert into User(userName,realName,password,userSex,userPhone,userAddress,mooto) 
+		values(#{userName},#{realName},#{password},#{userSex},#{userPhone},#{userAddress},#{mooto})
+	</insert>
+	
+	<!-- 管理员更改报名状态0——1 -->
+	<update id="updateAppleOne" parameterType="int">
+		update Children set childrenStat=1 where childrenId=#{childrenId};
+	</update>
+	<!-- 管理员更改报名状态1——3 -->
+	<update id="updateAppleTwo" parameterType="int">
+		update Children set childrenStat=3 where childrenId=#{childrenId};
+	</update>
+	<!-- 管理员删除用户 -->
+		<delete id="deleteUser" parameterType="int">
+			delete from user where userId=#{userId}
+		</delete>
+	
+</mapper>
