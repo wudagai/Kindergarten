@@ -23,7 +23,7 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 		<!-- 批量生成别名 -->
 		<package name="com.kindergarten.entity"/>
 	</typeAliases>
-
+	<!--这里是告诉MyBatis 去哪寻找映射SQL 的语句-->
 	<mappers>
 		<package name="com.kindergarten.dao"/>
 	</mappers>
