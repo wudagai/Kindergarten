@@ -14,3 +14,4 @@
 （5）浏览器：Google Chrome
 
 系统总体框架图：
+![](https://github.com/wudagai/kindergarten/raw/master/gitimg/1.jpg)
