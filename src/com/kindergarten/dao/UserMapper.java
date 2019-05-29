@@ -1,6 +1,7 @@
 package com.kindergarten.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -48,4 +49,8 @@ public interface UserMapper {
 	//用户注册
 	public void addUser(User user);
 	
+	/*//批量修改
+	@SuppressWarnings("rawtypes")
+	public void updateUserByIds(Map map);
+	*/
 }

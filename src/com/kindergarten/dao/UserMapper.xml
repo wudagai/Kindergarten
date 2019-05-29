@@ -169,7 +169,7 @@ from user u,children ch,childrenleave cl  where u.userId=ch.userId and ch.childr
 		 userStat=#{userStat}
 		</if>
 	</set>
-		where user.userId=#{userId};
+		where user.userId=#{userId}
 	</update>
 	<!-- 用户修改报名信息 -->
 	<update id="updateApple" parameterType="com.kindergarten.entity.Children">
@@ -200,7 +200,7 @@ from user u,children ch,childrenleave cl  where u.userId=ch.userId and ch.childr
 		 classId=#{classinfos.classId}
 		</if>
 	</set>
-		where children.childrenId=#{childrenId};
+		where children.childrenId=#{childrenId}
 	</update>
 	<!--用户注册 -->
 		<insert id="addUser" useGeneratedKeys="true" 
@@ -222,5 +222,17 @@ from user u,children ch,childrenleave cl  where u.userId=ch.userId and ch.childr
 		<delete id="deleteUser" parameterType="int">
 			delete from user where userId=#{userId}
 		</delete>
+		
+	<!-- 批量更新 -->
+	<!-- <update id="updateUserByIds" parameterType="java.util.Map">
+	update user set userPhone=#{userPhone},userAddress=#{userAddress}
+	where userId in
+	<foreach collection="ids" item="userId" separator="," open="(" close=")">
+	 #{userId}
+	</foreach>
+	
+	</update> -->
+	
+	
 	
 </mapper>
