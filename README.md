@@ -12,3 +12,6 @@
 （4）Web服务器：apache-tomcat-8.5.31
 
 （5）浏览器：Google Chrome
+
+系统总体框架图：
+
