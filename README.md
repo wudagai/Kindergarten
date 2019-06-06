@@ -18,3 +18,5 @@
 
 
 E-R图
+![](https://github.com/wudagai/kindergarten/blob/master/gitimg/E-R%E5%9B%BE.png)
+
